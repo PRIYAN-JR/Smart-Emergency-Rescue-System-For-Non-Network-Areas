@@ -1,0 +1,208 @@
+SMART EMERGENCY RESCUE SYSTEM FOR NON-NETWORK AREAS
+COMPLETE CONNECTIONS AND BUILD PROCEDURE
+==============================================================
+
+This guide records the pin connections for the prototype discussed so far.
+Build and test one section at a time. Disconnect USB power before changing
+wires. This is a prototype, not a certified emergency or medical device.
+
+PARTS
+-----
+- 2 x Arduino Nano (transmitter and receiver)
+- NEO-6M GPS module
+- 433 MHz RF transmitter module
+- 433 MHz RF receiver module
+- SSD1306 0.96-inch I2C OLED (128 x 64)
+- MAX30102 heart-rate sensor breakout
+- Bidirectional I2C logic-level converter
+- Momentary 4-pin tactile SOS pushbutton
+- 2-pin buzzer (H-Y-D-Z)
+- Breadboards and jumper wires
+- USB cables / suitable power supplies
+
+IMPORTANT POWER AND WIRING NOTES
+--------------------------------
+1. Label the boards TRANSMITTER NANO and RECEIVER NANO.
+2. Do not connect the 5V rails of the two Nanos together. They are separate
+   units. During testing, each Nano can be powered from its own USB cable.
+3. All modules connected to one Nano must share that Nano's GND.
+4. Check the exact breakout-board voltage ratings before connecting power.
+   A module's chip may be 3.3 V even if its breakout board accepts 5 V.
+5. The MAX30102 breakout used in this project is being powered from 3.3 V.
+   Keep the bidirectional logic-level converter between the 5 V Nano I2C
+   pins and the sensor, as previously wired.
+6. Do not connect the GPS module's RX pin unless you specifically need to
+   configure the GPS. GPS TX is connected to Nano D4 in this project.
+7. RF module antenna arrangements and supply requirements vary. Follow the
+   labels/datasheet for the exact modules. Keep the two RF modules on
+   compatible frequency bands (433 MHz).
+
+A. TRANSMITTER NANO CONNECTIONS
+===============================
+
+1) NEO-6M GPS MODULE
+--------------------
+GPS VCC  -> supply required by your GPS breakout (check its label/datasheet)
+GPS GND  -> Transmitter Nano GND
+GPS TX   -> Transmitter Nano D4
+GPS RX   -> Not connected for the current code
+
+The software uses SoftwareSerial gpsSerial(4, 3), so D4 is the Nano's
+software-serial receive pin for GPS data. D3 is not wired to GPS RX here.
+
+2) 433 MHz RF TRANSMITTER
+-------------------------
+RF transmitter DATA -> Transmitter Nano D12
+RF transmitter GND  -> Transmitter Nano GND
+RF transmitter VCC  -> supply required by your RF module (check rating)
+
+3) SOS MOMENTARY PUSHBUTTON
+---------------------------
+One side of button -> Transmitter Nano D2
+Opposite side      -> Transmitter Nano GND
+
+Code setting: pinMode(2, INPUT_PULLUP).
+No external pull-up resistor is needed for this arrangement.
+
+For a common 4-pin tactile switch, the two pins on each side may already
+be connected together internally. Put the switch across the breadboard's
+centre gap and use pins from opposite sides. If unsure, check continuity
+with a multimeter.
+
+4) MAX30102 HEART-RATE SENSOR + LEVEL CONVERTER
+-----------------------------------------------
+Transmitter Nano 5V   -> converter HV
+Transmitter Nano 3V3  -> converter LV
+Transmitter Nano GND -> converter GND (common ground for both sides)
+
+Transmitter Nano A4 (SDA) -> converter HV1
+Converter LV1             -> MAX30102 SDA
+
+Transmitter Nano A5 (SCL) -> converter HV2
+Converter LV2             -> MAX30102 SCL
+
+MAX30102 VIN -> Transmitter Nano 3V3
+MAX30102 GND -> common Transmitter Nano GND
+
+MAX30102 INT -> not connected for current code
+MAX30102 IRD -> not connected
+MAX30102 RD  -> not connected
+
+IMPORTANT: The converter's HV-side GND and LV-side GND must both be tied
+to the same common ground. Follow the converter's printed channel labels;
+some boards use different names. Do not connect A4/A5 directly to the
+sensor if retaining the level-converter arrangement.
+
+B. RECEIVER NANO CONNECTIONS
+============================
+
+1) 433 MHz RF RECEIVER
+----------------------
+RF receiver DATA -> Receiver Nano D11
+RF receiver GND  -> Receiver Nano GND
+RF receiver VCC  -> supply required by your RF module (check rating)
+
+If your receiver board has two DATA pins, they are often equivalent, but
+use the module documentation to confirm.
+
+2) SSD1306 0.96-inch I2C OLED
+-----------------------------
+OLED SDA -> Receiver Nano A4
+OLED SCL -> Receiver Nano A5
+OLED GND -> Receiver Nano GND
+OLED VCC -> supply accepted by your OLED breakout (check its rating)
+
+The current receiver code uses U8g2 hardware I2C on A4/A5.
+
+3) BUZZER (2-pin H-Y-D-Z)
+-------------------------
+Buzzer positive (+) -> Receiver Nano D6
+Buzzer negative (-) -> Receiver Nano GND
+
+This matches the buzzer test and receiver code. If the buzzer draws more
+current than a Nano GPIO can safely supply, use a suitable transistor
+driver and resistor instead of powering it directly from D6. Confirm the
+buzzer type and current rating. A passive buzzer can change pitch with
+tone(); an active buzzer may produce a mostly fixed tone.
+
+C. CONNECTION SUMMARY BY NANO PIN
+================================
+
+TRANSMITTER NANO
+D2  -> SOS button (other side of button to GND)
+D3  -> not connected to GPS in current wiring
+D4  <- GPS TX
+D12 -> RF transmitter DATA
+A4  <-> I2C SDA via level converter HV1/LV1 to MAX30102 SDA
+A5  <-> I2C SCL via level converter HV2/LV2 to MAX30102 SCL
+3V3 -> MAX30102 VIN and converter LV
+5V  -> converter HV
+GND -> GPS GND, RF transmitter GND, button GND, MAX30102 GND,
+       and converter ground(s)
+
+RECEIVER NANO
+D6  -> buzzer positive (+)
+D11 <- RF receiver DATA
+A4  <-> OLED SDA
+A5  <-> OLED SCL
+VCC/5V or 3V3 -> OLED and RF receiver only as supported by their boards
+GND -> OLED GND, RF receiver GND, buzzer negative (-)
+
+D. BUILD AND TEST IN THIS ORDER
+===============================
+
+1. Disconnect both Nanos from USB before wiring.
+2. Build the transmitter's GPS and RF section. Upload the known GPS + RF
+   transmitter sketch and verify coordinates are received.
+3. Build the receiver's RF and OLED section. Verify the OLED displays the
+   received data.
+4. Test the buzzer separately, then connect it to D6 and GND.
+5. Wire the SOS button to D2 and GND. Test INPUT_PULLUP: released should
+   read HIGH; pressed should read LOW. Confirm the button activates SOS.
+6. Wire the MAX30102 through the level converter. Run its standalone test
+   sketch first. Do not rely on BPM until it repeatedly gives plausible
+   readings while your finger is still.
+7. After each individual part works, upload the combined transmitter and
+   receiver sketches. The receiver packet parser must match the transmitter
+   packet format, e.g. SOS:1,LAT:...,LON:...,HR:76.
+8. Test outdoors for GPS satellite fix. Indoors, a GPS module may not get a
+   reliable fix. Do not interpret a stale last-known coordinate as a live fix.
+9. Test RF at short range first, then increase distance gradually. RF packet
+   loss can occur, and 433 MHz RF is not guaranteed to work at every distance
+   or through every obstacle.
+10. Secure the wiring and strain-relieve connections before a demonstration.
+
+E. EXPECTED PACKET FORMAT
+========================
+Emergency with valid GPS and heart-rate estimate:
+SOS:1,LAT:11.056714,LON:78.048195,HR:76
+
+Emergency with no current GPS fix:
+SOS:1,GPS:NO FIX,HR:NA
+
+These values are examples only. The actual heart rate may be NA until the
+sensor algorithm produces a recent valid estimate.
+
+F. TROUBLESHOOTING QUICK CHECKS
+===============================
+
+- No GPS fix: test outdoors with a clear view of the sky; verify GPS TX -> D4,
+  GPS baud rate, and GPS module power.
+- No RF packets: verify transmitter DATA -> D12 and receiver DATA -> D11,
+  shared ground on each board, compatible 433 MHz modules, and matching
+  RadioHead RH_ASK settings.
+- OLED blank: verify OLED power, GND, SDA -> A4, SCL -> A5, and the display
+  controller/address compatibility.
+- Button always pressed: use opposite sides of the tactile switch; button
+  connects D2 to GND only when pressed.
+- HR:NA: troubleshoot MAX30102 separately; check 3.3 V supply, level converter,
+  A4/A5 wiring, finger placement, and repeated beat detection. The receiver
+  can only display the HR value that the transmitter sends.
+- Weak buzzer: confirm buzzer type/rating. Do not overload a Nano pin; use a
+  transistor driver if needed.
+
+SAFETY LIMITATION
+-----------------
+This is a learning prototype. It is not a certified emergency communication
+system, and the MAX30102 plus software BPM estimate is not a medical device.
+Do not depend on it for real emergency response or clinical decisions.
