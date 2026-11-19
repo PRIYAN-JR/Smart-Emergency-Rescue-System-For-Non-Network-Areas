@@ -30,10 +30,10 @@ Block Diagram
 
 Circuit Diagrams
 
-Transmitter Side
+                                                      Transmitter Side
 <img width="823" height="476" alt="Circuit Diagram-Transmitter Side" src="https://github.com/user-attachments/assets/2ac3f661-bf88-42eb-981a-0ac158b34925" />
 
-Receiver Side
+                                                      Receiver Side
 <img width="778" height="476" alt="Circuit Diagram-Receiver Side" src="https://github.com/user-attachments/assets/ab7a8432-0334-439f-b3ab-e391060bd764" />
 
 
@@ -93,6 +93,5 @@ Project Status
 
 Hardware prototype and implementation.
 
----
 
 Developed as an Electronics and Communication Engineering project.
