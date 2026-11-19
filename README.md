@@ -27,17 +27,15 @@ Buzzer| Audio alert
 
 Block Diagram
 <img width="1248" height="449" alt="Block Diagram" src="https://github.com/user-attachments/assets/6e741577-6fe9-4942-96ab-7e7b53d4bb27" />
-"System Block Diagram" (Block%20Diagram.png)
 
 Circuit Diagrams
 
 Transmitter Side
-
-"Transmitter Circuit" (Circuit%20Diagram-Transmitter%20Side.png)
+<img width="823" height="476" alt="Circuit Diagram-Transmitter Side" src="https://github.com/user-attachments/assets/2ac3f661-bf88-42eb-981a-0ac158b34925" />
 
 Receiver Side
+<img width="778" height="476" alt="Circuit Diagram-Receiver Side" src="https://github.com/user-attachments/assets/ab7a8432-0334-439f-b3ab-e391060bd764" />
 
-"Receiver Circuit" (Circuit%20Diagram-Receiver%20Side.png)
 
 Working Principle
 
@@ -51,6 +49,7 @@ Working Principle
 8. The buzzer provides an audio alert when emergency information is received.
 
 Hardware Implementation
+<img width="826" height="499" alt="Hardware" src="https://github.com/user-attachments/assets/61d85fc1-23bb-4412-8692-e0235d1f4fa6" />
 
 The project consists of two main units:
 
